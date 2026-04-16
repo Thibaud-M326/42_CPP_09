@@ -7,8 +7,8 @@
 
 class BitcoinExchange {
 	private:
-		std::string	 _inputFilename;
-		std::map<std::string, >
+		std::string	_inputFilename;
+		std::map<std::string, double> btcPriceByDate;
 
 	public:
 		BitcoinExchange();

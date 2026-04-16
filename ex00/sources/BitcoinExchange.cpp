@@ -49,11 +49,22 @@ void	validateHeader(std::fstream& dataCsv)
 		warningMsg("<Warning> data.csv header should be : \"date,exchange_rate\"");
 }
 
-void printError(std::string errMsg, int print)
+void handleError(std::string errMsg, std::string wrongInput, int throwError)
 {
-	if (!print)
-		return;
-	std::cout << "Error: " << errMsg << std::endl;
+	std::string errorMessage = "Error: " + errMsg + " => " + wrongInput;
+
+	if (throwError)
+		throw std::runtime_error(errorMessage);
+	std::cout << errorMessage << std::endl;
+}
+
+bool toInt(int &num, std::string str)
+{
+	std::stringstream ss(str);
+	ss >> num;
+	if (!ss.eof() || ss.fail())
+		return 0;
+	return 1;
 }
 
 //un date valide c'est beaucoup de choses,
@@ -62,20 +73,27 @@ void printError(std::string errMsg, int print)
 //je suis oblige de prendre l annee le moi et la date pour verifier si ils sont juste, je prend dans une string jusqu a '-'
 //je prend les date, je verifie les dates 
 //2009-05-03
-int validateDateKey(std::string keyDate, int throwErr)
+int validateDateKey(std::string keyDate, int throwError)
 {
-	if (keyDate.size() > 10 || keyDate[4] != '-' || keyDate[7] != '-')
-
-	(void)throwErr;
+	int year = 0;
+	int month = 0;
+	int day = 0;
 
 	std::cout << "KeyDate : " << keyDate << std::endl;
-	// std::string year = extractDate();
-	// std::string month = extractDate();
-	// std::string day = extractDate();
-	//
-	// stringstream ss(KeyDate);
-	
-	return 0;
+
+	if (keyDate.size() != 10 || keyDate[4] != '-' || keyDate[7] != '-') {
+		handleError("bad input", keyDate, throwError);
+		return 0;
+	}
+
+	if ( !toInt(year, keyDate.substr(0, 4))
+		|| !toInt(month, keyDate.substr(5, 2))
+		|| !toInt(day, keyDate.substr(8, 2)))
+	{
+		handleError("bad input", keyDate, throwError);
+	}
+
+	return 1;
 }
 
 void	validateLines(std::fstream& dataCsv)
@@ -85,20 +103,18 @@ void	validateLines(std::fstream& dataCsv)
 
 	std::string readDate;
 	std::string readValue;
-	int					isValidKeyValue;
-	int					throwErr = 0;
+	int throwError = 0;
 
-	(void)isValidKeyValue;
 	while (std::getline(dataCsv, readDate, ',') && !dataCsv.eof())
 	{
 		std::getline(dataCsv, readValue);
 
-		validateDateKey(readDate);
+		validateDateKey(readDate, throwError);
 		// validateValue(readValue);
-		//
-		// insertKeyValueInDB();
+
+		// if (isValidKeyValue)
+		// 	insertKeyValueInDB();
 	}
-	
 }
 
 void	BitcoinExchange::createDB()
