@@ -3,14 +3,12 @@
 
 #include <fstream>
 #include <string>
+#include <map>
 
 class BitcoinExchange {
 	private:
-		std::string		_inputFilename;
-		std::fstream	_inputFile;
-		std::fstream	_dataFile;
-
-		void openFile(std::fstream&, std::string);
+		std::string	 _inputFilename;
+		std::map<std::string, >
 
 	public:
 		BitcoinExchange();
@@ -19,6 +17,8 @@ class BitcoinExchange {
 		~BitcoinExchange();
 
 		BitcoinExchange& operator=(const BitcoinExchange& other);
+
+		void createDB();
 };
 
 #endif

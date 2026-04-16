@@ -13,6 +13,7 @@ int main (int argc, char **argv)
 	{
 		BitcoinExchange btcEx(argv[1]);
 		
+		btcEx.createDB();
 	}
 	catch (std::exception &e)
 	{
