@@ -14,6 +14,7 @@ int main (int argc, char **argv)
 		BitcoinExchange btcEx(argv[1]);
 		
 		btcEx.createDB();
+		btcEx.printDB();
 	}
 	catch (std::exception &e)
 	{
