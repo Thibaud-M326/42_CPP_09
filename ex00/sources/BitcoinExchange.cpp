@@ -37,11 +37,6 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 	return *this;
 }
 
-void warningMsg(std::string msg)
-{
-	std::cout << msg << std::endl;
-}
-
 void	validateHeader(std::fstream& dataCsv)
 {
 	if (!dataCsv.is_open())
@@ -50,7 +45,7 @@ void	validateHeader(std::fstream& dataCsv)
 	std::string readBuf;
 	std::getline(dataCsv, readBuf);
 	if (readBuf != "date,exchange_rate")
-		warningMsg("<Warning> data.csv header should be : \"date,exchange_rate\"");
+		throw runtime_error("::validateHeader data.csv header should be : \"date,exchange_rate\"");
 }
 
 void handleError(std::string errMsg, std::string wrongInput, int throwError)
@@ -151,10 +146,6 @@ bool toDouble(double &num, std::string str)
 
 bool validateValue(std::string readValue, double& value, int throwError)
 {
-	(void)value;
-	(void)throwError;
-	std::cout << "readValue :" << readValue << std::endl;
-
 	if (!toDouble(value, readValue))
 	{
 		handleError("invalid value format", readValue, throwError);
@@ -168,15 +159,14 @@ void	BitcoinExchange::insertKeyValueInDB(std::string key, double value)
 	_btcPriceByDate[key] = value;
 }
 
-void	BitcoinExchange::validateLines(std::fstream& dataCsv)
+void	BitcoinExchange::validateLines(std::fstream& dataCsv, PriceByDateMap& parsedKeyValue, bool throwError)
 {
 	if (!dataCsv.is_open())
 		throw std::runtime_error("::validateLines : data.csv should be open");
 
 	std::string	readDate;
 	std::string	readValue;
-	double	value = -1;
-	int	throwError = 0;
+	double	value = 0;
 
 	while (std::getline(dataCsv, readDate, ',') && !dataCsv.eof())
 	{
@@ -187,7 +177,6 @@ void	BitcoinExchange::validateLines(std::fstream& dataCsv)
 		{
 			insertKeyValueInDB(readDate, value);
 		}
-		std::cout << std::endl;
 	}
 }
 
@@ -197,8 +186,11 @@ void	BitcoinExchange::createDB()
 	if (!dataCsv)
 		throw std::runtime_error("can't open file : data.csv");
 
+	PriceByDateMap parsedKeyValue;
+	bool throwError = true;
+
 	validateHeader(dataCsv);
-	validateLines(dataCsv);
+	validateLines(dataCsv, parsedKeyValue, throwError);
 
 	dataCsv.close();
 }
@@ -210,5 +202,4 @@ void	BitcoinExchange::printDB()
 	for (it = _btcPriceByDate.begin(); it != _btcPriceByDate.end(); ++it)
 		std::cout << it->first << " => " << it->second << std::endl;
 }
-
 
