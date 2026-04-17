@@ -45,7 +45,7 @@ void	validateHeader(std::fstream& dataCsv)
 	std::string readBuf;
 	std::getline(dataCsv, readBuf);
 	if (readBuf != "date,exchange_rate")
-		throw runtime_error("::validateHeader data.csv header should be : \"date,exchange_rate\"");
+		throw std::runtime_error("::validateHeader data.csv header should be : \"date,exchange_rate\"");
 }
 
 void handleError(std::string errMsg, std::string wrongInput, int throwError)
@@ -154,30 +154,22 @@ bool validateValue(std::string readValue, double& value, int throwError)
 	return 1;
 }
 
-void	BitcoinExchange::insertKeyValueInDB(std::string key, double value)
+void	BitcoinExchange::insertInPriceByDateMap(PriceByDateMap _btcPriceByDate)
 {
 	_btcPriceByDate[key] = value;
 }
 
-void	BitcoinExchange::validateLines(std::fstream& dataCsv, PriceByDateMap& parsedKeyValue, bool throwError)
+bool	BitcoinExchange::validateLine(std::string& readDate, std::string& readValue, PriceByDateMap& parsedKeyValue, bool& throwError)
 {
-	if (!dataCsv.is_open())
-		throw std::runtime_error("::validateLines : data.csv should be open");
+	double value = 0;
 
-	std::string	readDate;
-	std::string	readValue;
-	double	value = 0;
-
-	while (std::getline(dataCsv, readDate, ',') && !dataCsv.eof())
+	if (validateDate(readDate, throwError)
+		&& validateValue(readValue, value, throwError))
 	{
-		std::getline(dataCsv, readValue);
-
-		if ( validateDate(readDate, throwError)
-			&& validateValue(readValue, value, throwError))
-		{
-			insertKeyValueInDB(readDate, value);
-		}
+		parsedKeyValue[readDate] = value;
+		return true;
 	}
+	return false;
 }
 
 void	BitcoinExchange::createDB()
@@ -186,12 +178,17 @@ void	BitcoinExchange::createDB()
 	if (!dataCsv)
 		throw std::runtime_error("can't open file : data.csv");
 
-	PriceByDateMap parsedKeyValue;
+	std::string readDate;
+	std::string readValue;
 	bool throwError = true;
 
 	validateHeader(dataCsv);
-	validateLines(dataCsv, parsedKeyValue, throwError);
-
+	while (std::getline(dataCsv, readDate, ',') && !dataCsv.eof())
+	{
+		std::getline(dataCsv, readValue);
+		if (validateLine(readDate, readValue, throwError))
+			insertInPriceByDateMap(parsedKeyValue);
+	}
 	dataCsv.close();
 }
 
