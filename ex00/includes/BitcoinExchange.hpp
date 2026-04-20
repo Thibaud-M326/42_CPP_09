@@ -12,8 +12,11 @@ class BitcoinExchange {
 		std::string			_inputFilename;
 		PriceByDateMap	_btcPriceByDate;
 
-		bool	validateLine(std::string& readDate, std::string& readValue, PriceByDateMap& parsedKeyValue, bool& throwError);
 		void	insertInPriceByDateMap(std::string key, double value);
+
+
+		void	validateDataHeader(std::fstream& dataCsv);
+		void	validateFormatData(std::string line);
 
 	public:
 		BitcoinExchange();
@@ -25,6 +28,7 @@ class BitcoinExchange {
 
 		void createDB();
 		void printDB();
+		static void	handleError(std::string errMsg, std::string wrongInput, int throwError);
 };
 
 #endif
