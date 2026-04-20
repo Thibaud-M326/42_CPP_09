@@ -1,4 +1,5 @@
 #include "BitcoinExchange.hpp"
+#include "HandleError.hpp"
 #include "Parser.hpp"
 
 void	BitcoinExchange::validateDataHeader(std::fstream& dataCsv)
@@ -11,7 +12,7 @@ void	BitcoinExchange::validateDataHeader(std::fstream& dataCsv)
 
 	std::getline(dataCsv, line);
 	if (line != "date,exchange_rate")
-		handleError("invalid header format, should be : \"date,exchange_rate\"", line, throwError);
+		HandleError::handleError("invalid header format, should be : \"date,exchange_rate\"", line, throwError);
 }
 
 void	BitcoinExchange::validateFormatData(std::string line)
@@ -19,7 +20,7 @@ void	BitcoinExchange::validateFormatData(std::string line)
 	int throwError = 1;
 
 	if (line[10] != ',')
-		handleError("invalid data format", line, throwError);
+		HandleError::handleError("invalid data format", line, throwError);
 }
 
 void	BitcoinExchange::createDB()

@@ -1,5 +1,6 @@
 #include "Parser.hpp"
 #include "BitcoinExchange.hpp"
+#include "HandleError.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -53,13 +54,13 @@ void Parser::validateDate(std::string readDate, int throwError)
 	std::cout << "readDate : " << readDate << std::endl;
 
 	if (readDate.size() != 10 || readDate[4] != '-' || readDate[7] != '-') 
-		BitcoinExchange::handleError("bad format", readDate, throwError);
+		HandleError::handleError("bad format", readDate, throwError);
 
 	if ( !toInt(date.tm_year, readDate.substr(0, 4))
 		|| !toInt(date.tm_mon, readDate.substr(5, 2))
 		|| !toInt(date.tm_mday, readDate.substr(8, 2)))
 	{
-		BitcoinExchange::handleError("non-numeric characters in date", readDate, throwError);
+		HandleError::handleError("non-numeric characters in date", readDate, throwError);
 	}
 
 	std::cout << "year :" << date.tm_year << std::endl; 
@@ -70,7 +71,7 @@ void Parser::validateDate(std::string readDate, int throwError)
 		|| !validateMonth(date)
 		|| !validateDay(date))
 	{
-		BitcoinExchange::handleError("invalid year, month, day value", readDate, throwError);
+		HandleError::handleError("invalid year, month, day value", readDate, throwError);
 	}
 }
 
@@ -86,8 +87,8 @@ bool Parser::toDouble(double &num, std::string str)
 double Parser::validateValue(std::string parseValue, double& value, int throwError)
 {
 	if (parseValue.empty())
-		BitcoinExchange::handleError("invalid value format", "\"\"", throwError);
+		HandleError::handleError("invalid value format", "\"\"", throwError);
 	if ( !toDouble(value, parseValue))
-		BitcoinExchange::handleError("invalid value format", parseValue, throwError);
+		HandleError::handleError("invalid value format", parseValue, throwError);
 	return value;
 }
