@@ -4,7 +4,7 @@
 #include <string>
 
 namespace HandleError {
-	void handleError(std::string errMsg, std::string wrongInput, int throwError);
+	void handleError(std::string errMsg, std::string wrongInput);
 }
 
 #endif

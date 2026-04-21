@@ -47,25 +47,25 @@ bool Parser::validateDay(struct tm date)
 	return 0;
 }
 
-void Parser::validateDate(std::string readDate, int throwError)
+void Parser::validateDate(std::string readDate)
 {
 	struct tm date;
 
 	if (readDate.size() != 10 || readDate[4] != '-' || readDate[7] != '-') 
-		HandleError::handleError("bad format", readDate, throwError);
+		HandleError::handleError("bad format", readDate);
 
 	if ( !toInt(date.tm_year, readDate.substr(0, 4))
 		|| !toInt(date.tm_mon, readDate.substr(5, 2))
 		|| !toInt(date.tm_mday, readDate.substr(8, 2)))
 	{
-		HandleError::handleError("non-numeric characters in date", readDate, throwError);
+		HandleError::handleError("non-numeric characters in date", readDate);
 	}
 
 	if ( !validateYear(date)
 		|| !validateMonth(date)
 		|| !validateDay(date))
 	{
-		HandleError::handleError("invalid year, month, day value", readDate, throwError);
+		HandleError::handleError("invalid year, month, day value", readDate);
 	}
 }
 
@@ -78,16 +78,16 @@ bool Parser::toDouble(double &num, std::string str)
 	return 1;
 }
 
-double Parser::validateValue(std::string parseValue, double value, int throwError)
+double Parser::validateValue(std::string parseValue, double value)
 {
 	if (parseValue.empty())
-		HandleError::handleError("invalid value format", "\"\"", throwError);
+		HandleError::handleError("invalid value format", "\"\"");
 
 	if ( !toDouble(value, parseValue))
-		HandleError::handleError("invalid value format", parseValue, throwError);
+		HandleError::handleError("invalid value format", parseValue);
 
 	if (value < 0)
-		HandleError::handleError("not a positive number", parseValue, throwError);
+		HandleError::handleError("not a positive number", parseValue);
 
 	return value;
 }

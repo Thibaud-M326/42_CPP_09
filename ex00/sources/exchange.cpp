@@ -11,21 +11,20 @@ void	validateInputFileHeader(std::fstream& inputFile)
 		throw std::runtime_error("can't read data.csv");
 
 	std::string line;
-	bool throwError = false;
 
 	std::getline(inputFile, line);
 	if (line != "date | value")
-		HandleError::handleError("invalid header format, should be : \"date | value\"", line, throwError);
+		HandleError::handleError("invalid header format, should be : \"date | value\"", line);
 }
 
-void validateFormatInputFile(std::string line, bool throwError)
+void validateFormatInputFile(std::string line)
 {
 	if (line.size() < 13)
-		HandleError::handleError("bad input", line, throwError);
+		HandleError::handleError("bad input", line);
 
 	std::size_t found = line.find(" | ", 10);
 	if (found == std::string::npos)
-		HandleError::handleError("bad input", line, throwError);
+		HandleError::handleError("bad input", line);
 }
 
 void	BitcoinExchange::printWalletvalueByDate(std::string parseDate, double btcCount)
@@ -36,8 +35,7 @@ void	BitcoinExchange::printWalletvalueByDate(std::string parseDate, double btcCo
 	if (it->first != parseDate)
 	{
 		if (it == _btcPriceByDate.begin())
-			HandleError::handleError("no date matches", parseValue, throwError);
-
+			HandleError::handleError("no date matches", parseDate);
 		--it;
 	}
 	std::cout << parseDate << " => " << btcCount << " = " << (it->second * btcCount) << std::endl;
@@ -50,28 +48,27 @@ void BitcoinExchange::exchange(std::string inputFilename)
 		throw std::runtime_error(std::string("can't open file : ") + inputFilename);
 
 	std::string line;
-	bool throwError = true;
 	double btcCount;
 
 	validateInputFileHeader(inputFile);
 
 	while (std::getline(inputFile, line) && !inputFile.eof())
 	{
-		try 
-		{
-			validateFormatInputFile(line, throwError);
+		try {
+			validateFormatInputFile(line);
 
 			std::string parseDate = line.substr(0, 10);
 			std::string parseValue = line.substr(13, line.size());
 
-			Parser::validateDate(parseDate, throwError);
-			btcCount = Parser::validateValue(parseValue, btcCount, throwError);
+			Parser::validateDate(parseDate);
+			btcCount = Parser::validateValue(parseValue, btcCount);
 			if (btcCount > 1000)
-				HandleError::handleError("too large number", parseValue, throwError);
+				HandleError::handleError("too large number", parseValue);
 
 			printWalletvalueByDate(parseDate, btcCount);
 		} 
-		catch (std::exception &e)
-			std::cout << "exchange catch :" << e.what() << std::endl;
+		catch (std::exception &e) {
+			std::cout << e.what() << std::endl;
+		}
 	}
 }

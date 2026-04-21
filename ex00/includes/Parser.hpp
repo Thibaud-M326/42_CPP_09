@@ -17,8 +17,8 @@ class Parser {
 		Parser();
 		~Parser();
 
-		static void validateDate(std::string readDate, int throwError);
-		static double validateValue(std::string parseValue, double value, int throwError);
+		static void validateDate(std::string readDate);
+		static double validateValue(std::string parseValue, double value);
 };
 
 #endif
