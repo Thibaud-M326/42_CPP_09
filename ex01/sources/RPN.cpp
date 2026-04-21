@@ -24,6 +24,16 @@ void	isValidExpression(std::string expression)
 		else
 			throw std::runtime_error(std::string("bad expression input :") + expression);
 	}
+
+	if ((countNum - countOper) != 1)
+		throw std::runtime_error(std::string("bad expression input, bad num opr count :") + expression);
+
+	for (it = expression.begin(); it != expression.end(); ++it)
+	{
+		if (it != (expression.end() - 1))
+			if ((std::isdigit(*it) || *it == '+' || *it == '-' || *it == '*' || *it == '/') && *(it + 1) != ' ')
+				throw std::runtime_error(std::string("bad expression input, no space after num :") + expression);
+	}
 }
 
 double Rpn::evaluate(std::string expression) 
