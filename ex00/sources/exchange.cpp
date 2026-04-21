@@ -34,7 +34,12 @@ void	BitcoinExchange::printWalletvalueByDate(std::string parseDate, double btcCo
 
 	it = _btcPriceByDate.lower_bound(parseDate);
 	if (it->first != parseDate)
+	{
+		if (it == _btcPriceByDate.begin())
+			HandleError::handleError("no date matches", parseValue, throwError);
+
 		--it;
+	}
 	std::cout << parseDate << " => " << btcCount << " = " << (it->second * btcCount) << std::endl;
 }
 
@@ -52,7 +57,8 @@ void BitcoinExchange::exchange(std::string inputFilename)
 
 	while (std::getline(inputFile, line) && !inputFile.eof())
 	{
-		try {
+		try 
+		{
 			validateFormatInputFile(line, throwError);
 
 			std::string parseDate = line.substr(0, 10);
@@ -64,9 +70,8 @@ void BitcoinExchange::exchange(std::string inputFilename)
 				HandleError::handleError("too large number", parseValue, throwError);
 
 			printWalletvalueByDate(parseDate, btcCount);
-
-		} catch (std::exception &e) {
+		} 
+		catch (std::exception &e)
 			std::cout << "exchange catch :" << e.what() << std::endl;
-		}
 	}
 }
