@@ -9,24 +9,21 @@ typedef std::map<std::string, double> PriceByDateMap;
 
 class BitcoinExchange {
 	private:
-		std::string			_inputFilename;
 		PriceByDateMap	_btcPriceByDate;
 
 		void	insertInPriceByDateMap(std::string key, double value);
-
 
 		void	validateDataHeader(std::fstream& dataCsv);
 		void	validateFormatData(std::string line);
 
 	public:
 		BitcoinExchange();
-		BitcoinExchange(std::string inputFilename);
 		BitcoinExchange(const BitcoinExchange& copy);
+		BitcoinExchange& operator=(const BitcoinExchange& other);
 		~BitcoinExchange();
 
-		BitcoinExchange& operator=(const BitcoinExchange& other);
-
 		void createDB();
+		void exchange(std::string inputFilename);
 		void printDB();
 		static void	handleError(std::string errMsg, std::string wrongInput, int throwError);
 };

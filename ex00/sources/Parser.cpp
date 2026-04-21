@@ -51,8 +51,6 @@ void Parser::validateDate(std::string readDate, int throwError)
 {
 	struct tm date;
 
-	std::cout << "readDate : " << readDate << std::endl;
-
 	if (readDate.size() != 10 || readDate[4] != '-' || readDate[7] != '-') 
 		HandleError::handleError("bad format", readDate, throwError);
 
@@ -62,10 +60,6 @@ void Parser::validateDate(std::string readDate, int throwError)
 	{
 		HandleError::handleError("non-numeric characters in date", readDate, throwError);
 	}
-
-	std::cout << "year :" << date.tm_year << std::endl; 
-	std::cout << "month :" << date.tm_mon << std::endl; 
-	std::cout << "day :" << date.tm_mday << std::endl; 
 
 	if ( !validateYear(date)
 		|| !validateMonth(date)

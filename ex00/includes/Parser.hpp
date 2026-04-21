@@ -9,7 +9,7 @@ class Parser {
 		static bool	toInt(int &num, std::string str);
 		static bool	validateYear(struct tm date);
 		static bool	validateMonth(struct tm date);
-		static int		leapYear(int year);
+		static int	leapYear(int year);
 		static bool	validateDay(struct tm date);
 		static bool	toDouble(double &num, std::string str);
 

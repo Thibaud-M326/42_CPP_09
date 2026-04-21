@@ -9,6 +9,7 @@ INC_DIR = ./includes
 SRC =																			\
         $(SRC_DIR)/main.cpp								\
         $(SRC_DIR)/createDB.cpp						\
+        $(SRC_DIR)/exchange.cpp						\
         $(SRC_DIR)/Parser.cpp							\
         $(SRC_DIR)/BitcoinExchange.cpp		\
         $(SRC_DIR)/HandleError.cpp				\

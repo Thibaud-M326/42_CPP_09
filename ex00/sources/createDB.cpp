@@ -44,6 +44,9 @@ void	BitcoinExchange::createDB()
 		Parser::validateDate(parseDate, throwError);
 		value = Parser::validateValue(parseValue, value, throwError);
 
+		if (value < 0)
+			HandleError::handleError("not a positive number", line, throwError);
+
 		insertInPriceByDateMap(parseDate, value);
 	}
 	dataCsv.close();

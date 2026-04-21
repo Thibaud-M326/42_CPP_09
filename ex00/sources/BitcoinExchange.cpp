@@ -7,19 +7,12 @@
 #include <ctime>
 
 BitcoinExchange::BitcoinExchange()
-{
-	throw std::runtime_error("BitcoinExchange requires an input file");
-}
-
-BitcoinExchange::BitcoinExchange(std::string inputFilename)
 :
-	_inputFilename(inputFilename),
 	_btcPriceByDate()
 {}
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 :
-	_inputFilename(copy._inputFilename),
 	_btcPriceByDate(copy._btcPriceByDate)
 {}
 
@@ -31,7 +24,6 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 	if (this == &other)
 		return *this;
 
-	_inputFilename = other._inputFilename;
 	_btcPriceByDate = other._btcPriceByDate;
 	return *this;
 }

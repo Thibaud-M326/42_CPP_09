@@ -11,10 +11,12 @@ int main (int argc, char **argv)
 
 	try
 	{
-		BitcoinExchange btcEx(argv[1]);
+		BitcoinExchange btcEx;
+		std::string inputFilename = argv[1];
 		
 		btcEx.createDB();
-		btcEx.printDB();
+		// btcEx.printDB();
+		btcEx.exchange(inputFilename);
 	}
 	catch (std::exception &e)
 	{
