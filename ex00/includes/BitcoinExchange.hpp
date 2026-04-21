@@ -12,6 +12,7 @@ class BitcoinExchange {
 		PriceByDateMap	_btcPriceByDate;
 
 		void	insertInPriceByDateMap(std::string key, double value);
+		void	printWalletvalueByDate(std::string parseDate, double value);
 
 		void	validateDataHeader(std::fstream& dataCsv);
 		void	validateFormatData(std::string line);
@@ -25,7 +26,6 @@ class BitcoinExchange {
 		void createDB();
 		void exchange(std::string inputFilename);
 		void printDB();
-		static void	handleError(std::string errMsg, std::string wrongInput, int throwError);
 };
 
 #endif

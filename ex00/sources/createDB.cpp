@@ -19,6 +19,9 @@ void	BitcoinExchange::validateFormatData(std::string line)
 {
 	int throwError = 1;
 
+	if (line.size() < 11)
+		HandleError::handleError("invalid data format", line, throwError);
+
 	if (line[10] != ',')
 		HandleError::handleError("invalid data format", line, throwError);
 }

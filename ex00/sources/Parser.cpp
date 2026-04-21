@@ -78,11 +78,16 @@ bool Parser::toDouble(double &num, std::string str)
 	return 1;
 }
 
-double Parser::validateValue(std::string parseValue, double& value, int throwError)
+double Parser::validateValue(std::string parseValue, double value, int throwError)
 {
 	if (parseValue.empty())
 		HandleError::handleError("invalid value format", "\"\"", throwError);
+
 	if ( !toDouble(value, parseValue))
 		HandleError::handleError("invalid value format", parseValue, throwError);
+
+	if (value < 0)
+		HandleError::handleError("not a positive number", parseValue, throwError);
+
 	return value;
 }
