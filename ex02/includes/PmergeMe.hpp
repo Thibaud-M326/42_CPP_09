@@ -19,10 +19,17 @@ class PmergeMe {
 		bool _a_unpairedValue;
 
 		void	isValidArgs(std::string unsortedInts);
-    void	parseInts(const std::string& str);
-		void	printValues();
+		std::vector<int>	parseInts(const std::string& str);
+		void	printVector(const std::vector<int>& vec);
 		void	makePair();
+
 		void	pmerge();
+		void	makePair(std::vector<int>& toPair, PairVec& pair, int& unpaired);
+		void	createMain(std::vector<int>& main, const PairVec& pair);
+		int		idxJacobsthal(int n);
+		std::vector<int> idxsJacobsthal(size_t size);
+		std::vector<int> sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob);
+		std::vector<int> pmerge(std::vector<int> toSort);
 
 	public:
 		PmergeMe();
