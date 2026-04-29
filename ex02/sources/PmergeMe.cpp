@@ -96,12 +96,38 @@ int PmergeMe::idxJacobsthal(int n)
     return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
 }
 
-std::vector<int> PmergeMe::idxsJacobsthal(size_t size)
+std::vector<int> PmergeMe::completedReversedJacobsthal(std::vector<int> jacob)
 {
+	std::vector<int> completeJacob;
+	int previous = -1;
+	int current = 0;
+
+	std::vector<int>::iterator it;
+	for (it = jacob.begin(); it != jacob.end(); ++it)
+	{
+		current = *it;
+		for (; current > previous; current--)
+		{
+			completeJacob.push_back(current);
+		}
+		previous = *it;
+	}
+	return completeJacob;
+}
+
+std::vector<int> PmergeMe::idxsJacobsthal(int size)
+{
+	std::vector<int> jac;
 	std::vector<int> idxs;
 
-	for (size_t i = 0; i < size; i++)
-		idxs.push_back(idxJacobsthal(i));
+	for (int i = 3; i < size + 3; i++)
+		jac.push_back(idxJacobsthal(i) - 2);
+
+	idxs = completedReversedJacobsthal(jac);
+
+	std::cout << "idxs:" << std::endl;
+	printVector(idxs);
+	
 	return idxs;
 }
 
@@ -112,13 +138,16 @@ std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pen
 
 	for (jacobIt = idxsJacob.begin(); jacobIt != idxsJacob.end(); ++jacobIt)
 	{
-		PairVec::iterator pendIt = pend.begin() + *jacobIt;
+		if ((unsigned long)*jacobIt < pend.size())
+		{
+			PairVec::iterator pendIt = pend.begin() + *jacobIt;
 
-		std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
-		std::vector<int>::iterator sortIndex = lower_bound(nextMain.begin(), bigValueInNextMain, pendIt->first);
+			std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
+			std::vector<int>::iterator sortIndex = lower_bound(nextMain.begin(), bigValueInNextMain, pendIt->first);
 
-		nextMain.insert(sortIndex, pendIt->first);
-		inserted[*jacobIt] = true;
+			nextMain.insert(sortIndex, pendIt->first);
+			inserted[*jacobIt] = true;
+		}
 	}
 
 	if (unpaired != -1)
@@ -128,36 +157,6 @@ std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pen
 	}
 	return nextMain;
 }
-
-// std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob)
-// {
-// 	std::vector<bool> inserted(pend.size(), false);
-// 	std::vector<int>::iterator jacobIt;
-//
-// 	for (jacobIt = idxsJacob.begin(); jacobIt != idxsJacob.end(); ++jacobIt)
-// 	{
-// 		int jacob = *jacobIt;
-//
-// 		for (int i = jacob; i >= 1; i--)
-// 		{
-// 			if ((size_t)i > pend.size() || inserted[i - 1])
-// 				continue;
-//
-// 			PairVec::iterator pendIt = pend.begin() + (i - 1);
-// 			std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
-// 			std::vector<int>::iterator sortIndex = lower_bound(nextMain.begin(), bigValueInNextMain, pendIt->first);
-//
-// 			nextMain.insert(sortIndex, pendIt->first);
-// 			inserted[i - 1] = true;
-// 		}
-// 	}
-// 	if (unpaired != -1)
-// 	{
-// 		std::vector<int>::iterator sortIndexUnpaired = lower_bound(nextMain.begin(), nextMain.end(), unpaired);
-// 		nextMain.insert(sortIndexUnpaired, unpaired);
-// 	}
-// 	return nextMain;
-// }
 
 std::vector<int> PmergeMe::pmerge(std::vector<int> toSort)
 {
@@ -177,9 +176,6 @@ std::vector<int> PmergeMe::pmerge(std::vector<int> toSort)
 
 	std::cout << "pend.size():" << pend.size() << std::endl;
 	std::vector<int> idxsJacob = idxsJacobsthal(pend.size());
-
-	std::cout << "jacob:" << std::endl;
-	printVector(idxsJacob);
 
 	nextMain = sortNextMain(nextMain, pend, unpaired, idxsJacob);
 
