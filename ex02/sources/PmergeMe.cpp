@@ -3,13 +3,15 @@
 #include <string>
 #include <iostream>
 #include <limits>
+#include <algorithm>
 
 PmergeMe::PmergeMe()
 :
 	_values(),
 	_pairs(),
 	_unpairedValue(0),
-	_a_unpairedValue(false)
+	_a_unpairedValue(false),
+	_compare(0)
 {}
 
 PmergeMe::~PmergeMe()
@@ -76,6 +78,8 @@ void PmergeMe::makePair(std::vector<int>& toPair, PairVec& pair, int& unpaired)
 			pair.push_back(std::make_pair(*it, *(it + 1)));
 		else
 			pair.push_back(std::make_pair(*(it + 1), *it));
+		std::cout << *it << " " << *(it + 1) << std::endl;
+		_compare++;
 	}
 }
 
@@ -100,9 +104,31 @@ std::vector<int> PmergeMe::idxsJacobsthal(size_t size)
 {
 	std::vector<int> idxs;
 
-	for (size_t i = 0; i < size; i++)
-		idxs.push_back(idxJacobsthal(i));
+	for (size_t i = 4; i < size + 4; i++)
+		idxs.push_back(idxJacobsthal(i - 2));
 	return idxs;
+}
+
+int PmergeMe::binarySearch(std::vector<int>& v, int target, int high) 
+{
+	int low = 0;
+
+	while (low <= high) 
+	{
+		_compare++;
+		int mid = ((high - low) / 2) + low;
+
+		if (v[mid] == target) {
+			_compare++;
+			return true;
+		}
+		if (v[mid] > target)
+			high = mid - 1;
+		else
+			low = mid + 1;
+		_compare++;
+	}
+	return low;
 }
 
 std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob)
@@ -112,12 +138,23 @@ std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pen
 
 	for (jacobIt = idxsJacob.begin(); jacobIt != idxsJacob.end(); ++jacobIt)
 	{
-		PairVec::iterator pendIt = pend.begin() + *jacobIt;
+		PairVec::iterator pendIt = pend.begin() + *jacobIt - 1;
 
-		std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
-		std::vector<int>::iterator sortIndex = lower_bound(nextMain.begin(), bigValueInNextMain, pendIt->first);
+		// std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
+		
+		std::vector<int>::iterator HighIt = find(nextMain.begin(), nextMain.end(), pendIt->second);
 
-		nextMain.insert(sortIndex, pendIt->first);
+		int sortIndex;
+		if (HighIt == nextMain.end())
+			sortIndex = binarySearch(nextMain, pendIt->first, nextMain.size() - 1);
+		else
+		{
+			int highPos = std::distance(nextMain.begin(), HighIt);
+			sortIndex = binarySearch(nextMain, pendIt->first, highPos);
+		}
+
+		std::vector<int>::iterator vecIt = nextMain.begin() + sortIndex;
+		nextMain.insert(vecIt, pendIt->first);
 		inserted[*jacobIt] = true;
 	}
 
@@ -128,36 +165,6 @@ std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pen
 	}
 	return nextMain;
 }
-
-// std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob)
-// {
-// 	std::vector<bool> inserted(pend.size(), false);
-// 	std::vector<int>::iterator jacobIt;
-//
-// 	for (jacobIt = idxsJacob.begin(); jacobIt != idxsJacob.end(); ++jacobIt)
-// 	{
-// 		int jacob = *jacobIt;
-//
-// 		for (int i = jacob; i >= 1; i--)
-// 		{
-// 			if ((size_t)i > pend.size() || inserted[i - 1])
-// 				continue;
-//
-// 			PairVec::iterator pendIt = pend.begin() + (i - 1);
-// 			std::vector<int>::iterator bigValueInNextMain = lower_bound(nextMain.begin(), nextMain.end(), pendIt->second);
-// 			std::vector<int>::iterator sortIndex = lower_bound(nextMain.begin(), bigValueInNextMain, pendIt->first);
-//
-// 			nextMain.insert(sortIndex, pendIt->first);
-// 			inserted[i - 1] = true;
-// 		}
-// 	}
-// 	if (unpaired != -1)
-// 	{
-// 		std::vector<int>::iterator sortIndexUnpaired = lower_bound(nextMain.begin(), nextMain.end(), unpaired);
-// 		nextMain.insert(sortIndexUnpaired, unpaired);
-// 	}
-// 	return nextMain;
-// }
 
 std::vector<int> PmergeMe::pmerge(std::vector<int> toSort)
 {
@@ -196,4 +203,5 @@ void PmergeMe::sort(std::string arg)
 	std::vector<int> sorted = pmerge(values);
 	std::cout << "sorted:" << std::endl;
 	printVector(sorted);
+	std::cout << "compare:" << _compare << std::endl; 
 }
