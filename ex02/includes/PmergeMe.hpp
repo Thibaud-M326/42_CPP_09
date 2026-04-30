@@ -31,6 +31,7 @@ class PmergeMe {
 		std::vector<int> sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob);
 		std::vector<int> pmerge(std::vector<int> toSort);
 		std::vector<int> completedReversedJacobsthal(std::vector<int> jacob);
+		std::vector<int> getIdxsFromJacobsthal(std::vector<int> jacob);
 
 	public:
 		PmergeMe();
