@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
-		std::cout << "Usage: ./PmergeMe <int> ... " << std::endl;
+		std::cout << "Usage: ./PmergeMe <int, ...>" << std::endl;
 		return 1;
 	}
 	try {

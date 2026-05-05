@@ -7,10 +7,6 @@
 
 PmergeMe::PmergeMe()
 :
-	_values(),
-	_pairs(),
-	_unpairedValue(0),
-	_a_unpairedValue(false),
 	_compairCount(0)
 {}
 
@@ -62,6 +58,50 @@ void PmergeMe::printVector(const std::vector<int>& vec)
 
 //--------//
 
+std::vector<int> PmergeMe::getIdxsFromJacobsthal(std::vector<int> jacob)
+{
+	std::vector<int> completeJacob;
+	int previous = -1;
+	int current = 0;
+
+	std::vector<int>::iterator it;
+	for (it = jacob.begin(); it != jacob.end(); ++it)
+	{
+		current = *it;
+		for (; current > previous; current--)
+		{
+			completeJacob.push_back(current);
+		}
+		previous = *it;
+	}
+	return completeJacob;
+}
+
+int PmergeMe::idxJacobsthal(int n)
+{
+    if (n == 0)
+        return 0;
+    if (n == 1)
+        return 1;
+    return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
+}
+
+std::vector<int> PmergeMe::idxsJacobsthal(int size)
+{
+	std::vector<int> jac;
+	std::vector<int> idxs;
+
+	for (int i = 3; i < size + 3; i++)
+		jac.push_back(idxJacobsthal(i) - 2);
+
+	idxs = getIdxsFromJacobsthal(jac);
+
+	std::cout << "idxs:" << std::endl;
+	printVector(idxs);
+	
+	return idxs;
+}
+
 void PmergeMe::makePair(std::vector<int>& toPair, PairVec& pair, int& unpaired)
 {
 	if (toPair.size() % 2 != 0)
@@ -89,50 +129,6 @@ void PmergeMe::createMain(std::vector<int>& main, const PairVec& pair)
 
 	for (it = pair.begin(); it != pair.end(); ++it)
 		main.push_back(it->second);
-}
-
-int PmergeMe::idxJacobsthal(int n)
-{
-    if (n == 0)
-        return 0;
-    if (n == 1)
-        return 1;
-    return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
-}
-
-std::vector<int> PmergeMe::getIdxsFromJacobsthal(std::vector<int> jacob)
-{
-	std::vector<int> completeJacob;
-	int previous = -1;
-	int current = 0;
-
-	std::vector<int>::iterator it;
-	for (it = jacob.begin(); it != jacob.end(); ++it)
-	{
-		current = *it;
-		for (; current > previous; current--)
-		{
-			completeJacob.push_back(current);
-		}
-		previous = *it;
-	}
-	return completeJacob;
-}
-
-std::vector<int> PmergeMe::idxsJacobsthal(int size)
-{
-	std::vector<int> jac;
-	std::vector<int> idxs;
-
-	for (int i = 3; i < size + 3; i++)
-		jac.push_back(idxJacobsthal(i) - 2);
-
-	idxs = getIdxsFromJacobsthal(jac);
-
-	std::cout << "idxs:" << std::endl;
-	printVector(idxs);
-	
-	return idxs;
 }
 
 int PmergeMe::binarySearch(std::vector<int> &arr, int high, int x) 
@@ -167,7 +163,6 @@ std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pen
 
 			std::cout << "sortIndex:" << sortIndex << std::endl;
 
-			// (void)sortIndex;
 			std::vector<int>::iterator sortIndexIt = nextMain.begin() + sortIndex;
 			nextMain.insert(sortIndexIt, pendIt->first);
 		}
