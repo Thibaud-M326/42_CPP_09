@@ -24,10 +24,9 @@ class PmergeMe {
 		void							createMain(std::vector<int>& main, const PairVec& pair);
 		std::vector<int> 	idxsJacobsthal(int size);
 		int								idxJacobsthal(int n);
+		std::vector<int> 	getIdxsFromJacobsthal(std::vector<int> jacob);
 		int								binarySearch(std::vector<int> &arr, int high, int x);
 		std::vector<int> 	sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob);
-		std::vector<int> 	completedReversedJacobsthal(std::vector<int> jacob);
-		std::vector<int> 	getIdxsFromJacobsthal(std::vector<int> jacob);
 
 	public:
 		PmergeMe();

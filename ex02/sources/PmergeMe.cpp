@@ -79,11 +79,11 @@ std::vector<int> PmergeMe::getIdxsFromJacobsthal(std::vector<int> jacob)
 
 int PmergeMe::idxJacobsthal(int n)
 {
-    if (n == 0)
-        return 0;
-    if (n == 1)
-        return 1;
-    return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
+	if (n == 0)
+		return 0;
+	if (n == 1)
+		return 1;
+	return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
 }
 
 std::vector<int> PmergeMe::idxsJacobsthal(int size)
@@ -201,7 +201,7 @@ std::vector<int> PmergeMe::pmerge(std::vector<int> toSort)
 	return nextMain;
 }
 
-void PmergeMe::sort(std::string arg) 
+void PmergeMe::sort(std::string arg)
 {
 	isValidArgs(arg);
 	std::vector<int> values = parseInts(arg);
