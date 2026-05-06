@@ -1,9 +1,9 @@
-#include "PmergeMe.hpp"
 #include <limits>
 #include <iostream>
 #include <vector>
 
-void	PmergeMe::isValidArgs(std::string arg) 
+template <template <typename, typename> class Container>
+void PmergeMe<Container>::isValidArgs(std::string arg) 
 {
 	std::string::iterator it;
 	int digitSize = 0;
@@ -23,7 +23,8 @@ void	PmergeMe::isValidArgs(std::string arg)
 	}
 }
 
-std::vector<int> PmergeMe::parseInts(const std::string& str, std::vector<int>& values)
+template <template <typename, typename> class Container>
+typename PmergeMe<Container>::IntContainer PmergeMe<Container>::parseInts(const std::string& str, IntContainer& values)
 {
 	std::istringstream iss(str);
 	long n;
@@ -40,11 +41,12 @@ std::vector<int> PmergeMe::parseInts(const std::string& str, std::vector<int>& v
 	return values;
 }
 
-void PmergeMe::printVector(const std::vector<int>& vec)
+template <template <typename, typename> class Container>
+void PmergeMe<Container>::printContainer(const IntContainer& container)
 {
-	std::vector<int>::const_iterator it;
+	typename IntContainer::const_iterator it;
 
-	for (it = vec.begin(); it != vec.end(); ++it)
+	for (it = container.begin(); it != container.end(); ++it)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 }
