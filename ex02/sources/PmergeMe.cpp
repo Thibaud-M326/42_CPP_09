@@ -57,11 +57,11 @@ int PmergeMe::binarySearch(std::vector<int> &arr, int high, int x)
 	return low;
 }
 
-std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob)
+std::vector<int> PmergeMe::sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired)
 {
 	std::vector<int>::iterator jacobIt;
 
-	for (jacobIt = idxsJacob.begin(); jacobIt != idxsJacob.end(); ++jacobIt)
+	for (jacobIt = _idxsJacob.begin(); jacobIt != _idxsJacob.end(); ++jacobIt)
 	{
 		if ((unsigned long)*jacobIt < pend.size())
 		{
@@ -101,9 +101,7 @@ std::vector<int> PmergeMe::pmerge(std::vector<int> toSort)
 	
 	nextMain = pmerge(main);
 
-	std::vector<int> idxsJacob = idxsJacobsthal(pend.size());
-
-	nextMain = sortNextMain(nextMain, pend, unpaired, idxsJacob);
+	nextMain = sortNextMain(nextMain, pend, unpaired);
 
 	return nextMain;
 }
@@ -112,8 +110,10 @@ void PmergeMe::sort(std::string arg)
 {
 	isValidArgs(arg);
 	std::vector<int> vecValues;
+	int jacobMaxSequence = 12;
 
 	parseInts(arg, vecValues);
+	_idxsJacob = idxsJacobsthal(jacobMaxSequence);
 
 	std::cout << "before: ";
 	printVector(vecValues);

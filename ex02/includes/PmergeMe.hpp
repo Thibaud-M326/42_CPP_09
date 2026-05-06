@@ -15,6 +15,7 @@ class PmergeMe {
 
 		int _elements;
 		int _compairCount;
+		std::vector<int>	_idxsJacob;
 
 		void							isValidArgs(std::string unsortedInts);
 		std::vector<int>	parseInts(const std::string& str, std::vector<int>& values);
@@ -27,7 +28,7 @@ class PmergeMe {
 		int								idxJacobsthal(int n);
 		std::vector<int> 	getIdxsFromJacobsthal(std::vector<int> jacob);
 		int								binarySearch(std::vector<int> &arr, int high, int x);
-		std::vector<int> 	sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired, std::vector<int> idxsJacob);
+		std::vector<int>	sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired);
 
 	public:
 		PmergeMe();

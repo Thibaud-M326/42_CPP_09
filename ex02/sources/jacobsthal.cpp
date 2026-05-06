@@ -39,9 +39,6 @@ std::vector<int> PmergeMe::idxsJacobsthal(int size)
 
 	idxs = getIdxsFromJacobsthal(jac);
 
-	std::cout << "idxs:" << std::endl;
-	printVector(idxs);
-	
 	return idxs;
 }
 

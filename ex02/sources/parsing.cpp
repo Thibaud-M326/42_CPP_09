@@ -11,15 +11,15 @@ void	PmergeMe::isValidArgs(std::string arg)
 	for (it = arg.begin(); it != arg.end(); ++it)
 	{
 		if (*it == ' ' && *(it + 1) == '-' && std::isdigit(*(it + 2)))
-			throw std::runtime_error(std::string("only positive number allowed :") + arg);
+			throw std::runtime_error(std::string("only positive number allowed"));
 		if (!std::isdigit(*it) && *it != ' ')
-			throw std::runtime_error(std::string("bad arguments input :") + arg);
+			throw std::runtime_error(std::string("bad arguments input"));
 		if (std::isdigit(*it))
 			digitSize++;
 		if (*it == ' ')
 			digitSize = 0;
 		if (digitSize > 10)
-			throw std::runtime_error(std::string("bad arguments input, int overflow :") + arg);
+			throw std::runtime_error(std::string("bad arguments input, int overflow"));
 	}
 }
 
@@ -32,9 +32,9 @@ std::vector<int> PmergeMe::parseInts(const std::string& str, std::vector<int>& v
 	{
 		_elements++;
 		if (n > std::numeric_limits<int>::max() || n < std::numeric_limits<int>::min())
-			throw std::runtime_error(std::string("bad arguments input, int overflow :") + str);
+			throw std::runtime_error(std::string("bad arguments input, int overflow"));
 		if (_elements > 3000)
-			throw std::runtime_error(std::string("3000 elements max to sort :") + str);
+			throw std::runtime_error(std::string("3000 elements max to sort"));
 		values.push_back(n);
 	}
 	return values;
