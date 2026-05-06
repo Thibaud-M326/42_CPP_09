@@ -113,11 +113,11 @@ void PmergeMe::sort(std::string arg)
 	std::vector<int> vecValues;
 
 	parseInts(arg, vecValues);
-	std::cout << "unsorted:" << std::endl;
+	std::cout << "Before: " << std::endl;
 	printVector(vecValues);
 
 	std::vector<int> sorted = pmerge(vecValues);
-	std::cout << "sorted:" << std::endl;
+	std::cout << "After:  " << std::endl;
 	printVector(sorted);
 
 	std::cout << "_compairCount:" << _compairCount << std::endl;
