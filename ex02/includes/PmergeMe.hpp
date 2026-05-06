@@ -5,30 +5,32 @@
 #include <vector>
 #include <sstream>
 
-typedef std::pair<int, int> IntPair;
-typedef std::vector<IntPair> PairVec;
-
+template <typename Container>
 class PmergeMe {
 	private:
+
+		typedef std::pair<int, int> IntPair;
+		typedef Container <IntPair> PairVec;
+
 		PmergeMe(const PmergeMe& copy);
 		PmergeMe& operator=(const PmergeMe& other);
 
-		int _elements;
-		int _compairCount;
-		std::vector<int>	_idxsJacob;
+		int 			_elements;
+		int 			_compairCount;
+		Container	_idxsJacob;
 
 		void							isValidArgs(std::string unsortedInts);
-		std::vector<int>	parseInts(const std::string& str, std::vector<int>& values);
-		void							printVector(const std::vector<int>& vec);
+		Container					parseInts(const std::string& str, Container& values);
+		void							printVector(const Container& vec);
 
-		std::vector<int> 	pmerge(std::vector<int> toSort);
-		void							makePair(std::vector<int>& toPair, PairVec& pair, int& unpaired);
-		void							createMain(std::vector<int>& main, const PairVec& pair);
-		std::vector<int> 	idxsJacobsthal(int size);
+		Container 				pmerge(Container toSort);
+		void							makePair(Container& toPair, PairVec& pair, int& unpaired);
+		void							createMain(Container& main, const PairVec& pair);
+		Container					idxsJacobsthal(int size);
 		int								idxJacobsthal(int n);
-		std::vector<int> 	getIdxsFromJacobsthal(std::vector<int> jacob);
-		int								binarySearch(std::vector<int> &arr, int high, int x);
-		std::vector<int>	sortNextMain(std::vector<int>& nextMain, PairVec& pend, int& unpaired);
+		Container					getIdxsFromJacobsthal(Container jacob);
+		int								binarySearch(Container &arr, int high, int x);
+		Container					sortNextMain(Container& nextMain, PairVec& pend, int& unpaired);
 
 	public:
 		PmergeMe();
