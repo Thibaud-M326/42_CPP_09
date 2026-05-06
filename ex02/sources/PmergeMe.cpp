@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <iomanip>
 
 PmergeMe::PmergeMe()
 :
@@ -113,12 +114,19 @@ void PmergeMe::sort(std::string arg)
 	std::vector<int> vecValues;
 
 	parseInts(arg, vecValues);
-	std::cout << "Before: " << std::endl;
+
+	std::cout << "before: ";
 	printVector(vecValues);
 
+	clock_t start = clock();
 	std::vector<int> sorted = pmerge(vecValues);
-	std::cout << "After:  " << std::endl;
+	clock_t end = clock();
+
+	std::cout << "after:  ";
 	printVector(sorted);
+
+  double elapsed_us = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1e6;
+	std::cout << "Time to process a range of " << _elements << " elements with std::vector : " << std::fixed << std::setprecision(5) << elapsed_us << "us" << std::endl;
 
 	std::cout << "_compairCount:" << _compairCount << std::endl;
 }
