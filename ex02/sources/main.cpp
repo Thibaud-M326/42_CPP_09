@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 		std::string unsortedInts = argv[1];
 		PmergeMe pmerge;
 
-		pmerge.sort(unsortedInts, );
+		pmerge.sort(unsortedInts);
 	}	catch (std::exception& e) {
 		std::cout << "Error : " << e.what() << std::endl;
 	}

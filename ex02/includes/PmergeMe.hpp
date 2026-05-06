@@ -13,10 +13,11 @@ class PmergeMe {
 		PmergeMe(const PmergeMe& copy);
 		PmergeMe& operator=(const PmergeMe& other);
 
+		int _elements;
 		int _compairCount;
 
 		void							isValidArgs(std::string unsortedInts);
-		std::vector<int>	parseInts(const std::string& str);
+		std::vector<int>	parseInts(const std::string& str, std::vector<int>& values);
 		void							printVector(const std::vector<int>& vec);
 
 		std::vector<int> 	pmerge(std::vector<int> toSort);

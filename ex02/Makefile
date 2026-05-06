@@ -7,8 +7,10 @@ SRC_DIR = ./sources
 INC_DIR = ./includes
 
 SRC =																			\
-        $(SRC_DIR)/main.cpp								\
         $(SRC_DIR)/PmergeMe.cpp						\
+        $(SRC_DIR)/jacobsthal.cpp					\
+        $(SRC_DIR)/main.cpp								\
+        $(SRC_DIR)/parsing.cpp						\
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.d)
