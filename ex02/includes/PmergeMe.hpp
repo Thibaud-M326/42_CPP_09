@@ -1,7 +1,6 @@
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
 
-#include <string>
 #include <vector>
 #include <deque>
 #include <utility>
@@ -47,7 +46,6 @@ class PmergeMe {
 
 		// std::deque
 		void							parseDeque(int argc, char** argv, IntDeque& values);
-		void							printDeque(const IntDeque& values);
 		IntDeque					sortDeque(const IntDeque& values);
 		ElemDeque					pmergeDeque(const ElemDeque& toSort);
 		void							makePairDeque(const ElemDeque& toPair, ElemPairDeque& pairs, bool& hasUnpaired, Elem& unpaired);

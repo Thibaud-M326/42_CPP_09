@@ -65,15 +65,6 @@ void PmergeMe::printVector(const IntVector& values)
 	std::cout << std::endl;
 }
 
-void PmergeMe::printDeque(const IntDeque& values)
-{
-	IntDeque::const_iterator it;
-
-	for (it = values.begin(); it != values.end(); ++it)
-		std::cout << *it << " ";
-	std::cout << std::endl;
-}
-
 /* ----------------------------- jacobsthal ---------------------------- */
 
 // Insertion order of the "pend" elements (0-based) : b1, b3 b2, b5 b4, b11..b6, ...
@@ -365,7 +356,7 @@ void PmergeMe::sort(int argc, char** argv)
 	clock_gettime(CLOCK_MONOTONIC, &start);
 	IntDeque deq;
 	parseDeque(argc, argv, deq);
-	IntDeque sortedDeq = sortDeque(deq);
+	sortDeque(deq);
 	clock_gettime(CLOCK_MONOTONIC, &end);
 	double elapsedDeq = elapsedUs(start, end);
 
