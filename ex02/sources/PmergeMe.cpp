@@ -103,180 +103,240 @@ std::vector<int> PmergeMe::jacobsthalOrder(int size)
 
 /* ------------------------------ std::vector -------------------------- */
 
-void PmergeMe::makePairVector(IntVector& toPair, PairVector& pair, int& unpaired)
+// pairs the elements as (small, big). The last one is kept apart if the count is odd.
+void PmergeMe::makePairVector(const ElemVector& toPair, ElemPairVector& pairs, bool& hasUnpaired, Elem& unpaired)
 {
-	if (toPair.size() % 2 != 0)
-	{
+	hasUnpaired = (toPair.size() % 2 != 0);
+	if (hasUnpaired)
 		unpaired = toPair.back();
-		toPair.pop_back();
-	}
 
-	IntVector::iterator it;
-
-	for (it = toPair.begin(); it != toPair.end(); it += 2)
+	size_t pairedSize = toPair.size() - (toPair.size() % 2);
+	for (size_t i = 0; i < pairedSize; i += 2)
 	{
-		if (*it < *(it + 1))
-			pair.push_back(std::make_pair(*it, *(it + 1)));
+		if (toPair[i].first < toPair[i + 1].first)
+			pairs.push_back(std::make_pair(toPair[i], toPair[i + 1]));
 		else
-			pair.push_back(std::make_pair(*(it + 1), *it));
+			pairs.push_back(std::make_pair(toPair[i + 1], toPair[i]));
 	}
 }
 
-void PmergeMe::createMainVector(IntVector& main, const PairVector& pair)
+// the bigs, each one labeled with the index of its pair
+void PmergeMe::createMainVector(ElemVector& mains, const ElemPairVector& pairs)
 {
-	PairVector::const_iterator it;
-
-	for (it = pair.begin(); it != pair.end(); ++it)
-		main.push_back(it->second);
+	for (size_t i = 0; i < pairs.size(); i++)
+		mains.push_back(Elem(pairs[i].second.first, static_cast<int>(i)));
 }
 
-int PmergeMe::binarySearchVector(IntVector& arr, int high, int x)
+// first position in [0, end) where x can be inserted
+size_t PmergeMe::binarySearchVector(const ElemVector& arr, size_t end, int x)
 {
-	int low = 0;
-	while (low <= high) {
-		int mid = low + (high - low) / 2;
-		if (arr[mid] < x)
+	size_t low = 0;
+	size_t high = end;
+
+	while (low < high)
+	{
+		size_t mid = low + (high - low) / 2;
+		if (arr[mid].first < x)
 			low = mid + 1;
 		else
-			high = mid - 1;
+			high = mid;
 	}
 	return low;
 }
 
-PmergeMe::IntVector PmergeMe::sortNextMainVector(IntVector& nextMain, PairVector& pend, int& unpaired)
+size_t PmergeMe::findPosVector(const ElemVector& arr, int id)
 {
+	size_t pos = 0;
+
+	while (arr[pos].second != id)
+		pos++;
+	return pos;
+}
+
+PmergeMe::ElemVector PmergeMe::insertPendVector(const ElemVector& sortedMains, const ElemPairVector& pairs, bool hasUnpaired, const Elem& unpaired)
+{
+	ElemVector chain;
+	ElemVector pend;
+
+	// bigs in sorted order, and the smalls that follow them : chain = a1..ak, pend = b1..bk
+	for (size_t i = 0; i < sortedMains.size(); i++)
+	{
+		const ElemPair& pair = pairs[sortedMains[i].second];
+		chain.push_back(pair.second);
+		pend.push_back(pair.first);
+	}
+	// the unpaired element is the last b, without any a
+	if (hasUnpaired)
+		pend.push_back(unpaired);
+
 	std::vector<int> order = jacobsthalOrder(pend.size());
 	std::vector<int>::iterator orderIt;
 
 	for (orderIt = order.begin(); orderIt != order.end(); ++orderIt)
 	{
-		PairVector::iterator pendIt = pend.begin() + *orderIt;
+		size_t idx = *orderIt;
+		size_t end = chain.size();
 
-		IntVector::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
-		int bigValuePos = std::distance(nextMain.begin(), bigIt);
-		int sortIndex = binarySearchVector(nextMain, bigValuePos, pendIt->first);
+		// search only before its big
+		if (idx < sortedMains.size())
+			end = findPosVector(chain, pairs[sortedMains[idx].second].second.second);
 
-		IntVector::iterator sortIndexIt = nextMain.begin() + sortIndex;
-		nextMain.insert(sortIndexIt, pendIt->first);
+		size_t pos = binarySearchVector(chain, end, pend[idx].first);
+		chain.insert(chain.begin() + pos, pend[idx]);
 	}
-
-	if (unpaired != -1)
-	{
-		int sortIndexUnpaired = binarySearchVector(nextMain, nextMain.size() - 1, unpaired);
-		IntVector::iterator sortIndexUnpairedIt = nextMain.begin() + sortIndexUnpaired;
-		nextMain.insert(sortIndexUnpairedIt, unpaired);
-	}
-	return nextMain;
+	return chain;
 }
 
-PmergeMe::IntVector PmergeMe::pmergeVector(IntVector toSort)
+PmergeMe::ElemVector PmergeMe::pmergeVector(const ElemVector& toSort)
 {
 	if (toSort.size() < 2)
 		return toSort;
-	PairVector pair;
-	int unpaired = -1;
 
-	makePairVector(toSort, pair, unpaired);
-	PairVector pend = pair;
+	ElemPairVector pairs;
+	bool hasUnpaired = false;
+	Elem unpaired;
 
-	IntVector main;
-	IntVector nextMain;
-	createMainVector(main, pair);
+	makePairVector(toSort, pairs, hasUnpaired, unpaired);
 
-	nextMain = pmergeVector(main);
+	ElemVector mains;
+	createMainVector(mains, pairs);
 
-	nextMain = sortNextMainVector(nextMain, pend, unpaired);
+	ElemVector sortedMains = pmergeVector(mains);
 
-	return nextMain;
+	return insertPendVector(sortedMains, pairs, hasUnpaired, unpaired);
+}
+
+PmergeMe::IntVector PmergeMe::sortVector(const IntVector& values)
+{
+	ElemVector elems;
+	for (size_t i = 0; i < values.size(); i++)
+		elems.push_back(Elem(values[i], static_cast<int>(i)));
+
+	ElemVector sortedElems = pmergeVector(elems);
+
+	IntVector sorted;
+	for (size_t i = 0; i < sortedElems.size(); i++)
+		sorted.push_back(sortedElems[i].first);
+	return sorted;
 }
 
 /* ------------------------------ std::deque --------------------------- */
 
-void PmergeMe::makePairDeque(IntDeque& toPair, PairDeque& pair, int& unpaired)
+// pairs the elements as (small, big). The last one is kept apart if the count is odd.
+void PmergeMe::makePairDeque(const ElemDeque& toPair, ElemPairDeque& pairs, bool& hasUnpaired, Elem& unpaired)
 {
-	if (toPair.size() % 2 != 0)
-	{
+	hasUnpaired = (toPair.size() % 2 != 0);
+	if (hasUnpaired)
 		unpaired = toPair.back();
-		toPair.pop_back();
-	}
 
-	IntDeque::iterator it;
-
-	for (it = toPair.begin(); it != toPair.end(); it += 2)
+	size_t pairedSize = toPair.size() - (toPair.size() % 2);
+	for (size_t i = 0; i < pairedSize; i += 2)
 	{
-		if (*it < *(it + 1))
-			pair.push_back(std::make_pair(*it, *(it + 1)));
+		if (toPair[i].first < toPair[i + 1].first)
+			pairs.push_back(std::make_pair(toPair[i], toPair[i + 1]));
 		else
-			pair.push_back(std::make_pair(*(it + 1), *it));
+			pairs.push_back(std::make_pair(toPair[i + 1], toPair[i]));
 	}
 }
 
-void PmergeMe::createMainDeque(IntDeque& main, const PairDeque& pair)
+// the bigs, each one labeled with the index of its pair
+void PmergeMe::createMainDeque(ElemDeque& mains, const ElemPairDeque& pairs)
 {
-	PairDeque::const_iterator it;
-
-	for (it = pair.begin(); it != pair.end(); ++it)
-		main.push_back(it->second);
+	for (size_t i = 0; i < pairs.size(); i++)
+		mains.push_back(Elem(pairs[i].second.first, static_cast<int>(i)));
 }
 
-int PmergeMe::binarySearchDeque(IntDeque& arr, int high, int x)
+// first position in [0, end) where x can be inserted
+size_t PmergeMe::binarySearchDeque(const ElemDeque& arr, size_t end, int x)
 {
-	int low = 0;
-	while (low <= high) {
-		int mid = low + (high - low) / 2;
-		if (arr[mid] < x)
+	size_t low = 0;
+	size_t high = end;
+
+	while (low < high)
+	{
+		size_t mid = low + (high - low) / 2;
+		if (arr[mid].first < x)
 			low = mid + 1;
 		else
-			high = mid - 1;
+			high = mid;
 	}
 	return low;
 }
 
-PmergeMe::IntDeque PmergeMe::sortNextMainDeque(IntDeque& nextMain, PairDeque& pend, int& unpaired)
+size_t PmergeMe::findPosDeque(const ElemDeque& arr, int id)
 {
+	size_t pos = 0;
+
+	while (arr[pos].second != id)
+		pos++;
+	return pos;
+}
+
+PmergeMe::ElemDeque PmergeMe::insertPendDeque(const ElemDeque& sortedMains, const ElemPairDeque& pairs, bool hasUnpaired, const Elem& unpaired)
+{
+	ElemDeque chain;
+	ElemDeque pend;
+
+	// bigs in sorted order, and the smalls that follow them : chain = a1..ak, pend = b1..bk
+	for (size_t i = 0; i < sortedMains.size(); i++)
+	{
+		const ElemPair& pair = pairs[sortedMains[i].second];
+		chain.push_back(pair.second);
+		pend.push_back(pair.first);
+	}
+	// the unpaired element is the last b, without any a
+	if (hasUnpaired)
+		pend.push_back(unpaired);
+
 	std::vector<int> order = jacobsthalOrder(pend.size());
 	std::vector<int>::iterator orderIt;
 
 	for (orderIt = order.begin(); orderIt != order.end(); ++orderIt)
 	{
-		PairDeque::iterator pendIt = pend.begin() + *orderIt;
+		size_t idx = *orderIt;
+		size_t end = chain.size();
 
-		IntDeque::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
-		int bigValuePos = std::distance(nextMain.begin(), bigIt);
-		int sortIndex = binarySearchDeque(nextMain, bigValuePos, pendIt->first);
+		// search only before its big
+		if (idx < sortedMains.size())
+			end = findPosDeque(chain, pairs[sortedMains[idx].second].second.second);
 
-		IntDeque::iterator sortIndexIt = nextMain.begin() + sortIndex;
-		nextMain.insert(sortIndexIt, pendIt->first);
+		size_t pos = binarySearchDeque(chain, end, pend[idx].first);
+		chain.insert(chain.begin() + pos, pend[idx]);
 	}
-
-	if (unpaired != -1)
-	{
-		int sortIndexUnpaired = binarySearchDeque(nextMain, nextMain.size() - 1, unpaired);
-		IntDeque::iterator sortIndexUnpairedIt = nextMain.begin() + sortIndexUnpaired;
-		nextMain.insert(sortIndexUnpairedIt, unpaired);
-	}
-	return nextMain;
+	return chain;
 }
 
-PmergeMe::IntDeque PmergeMe::pmergeDeque(IntDeque toSort)
+PmergeMe::ElemDeque PmergeMe::pmergeDeque(const ElemDeque& toSort)
 {
 	if (toSort.size() < 2)
 		return toSort;
-	PairDeque pair;
-	int unpaired = -1;
 
-	makePairDeque(toSort, pair, unpaired);
-	PairDeque pend = pair;
+	ElemPairDeque pairs;
+	bool hasUnpaired = false;
+	Elem unpaired;
 
-	IntDeque main;
-	IntDeque nextMain;
-	createMainDeque(main, pair);
+	makePairDeque(toSort, pairs, hasUnpaired, unpaired);
 
-	nextMain = pmergeDeque(main);
+	ElemDeque mains;
+	createMainDeque(mains, pairs);
 
-	nextMain = sortNextMainDeque(nextMain, pend, unpaired);
+	ElemDeque sortedMains = pmergeDeque(mains);
 
-	return nextMain;
+	return insertPendDeque(sortedMains, pairs, hasUnpaired, unpaired);
+}
+
+PmergeMe::IntDeque PmergeMe::sortDeque(const IntDeque& values)
+{
+	ElemDeque elems;
+	for (size_t i = 0; i < values.size(); i++)
+		elems.push_back(Elem(values[i], static_cast<int>(i)));
+
+	ElemDeque sortedElems = pmergeDeque(elems);
+
+	IntDeque sorted;
+	for (size_t i = 0; i < sortedElems.size(); i++)
+		sorted.push_back(sortedElems[i].first);
+	return sorted;
 }
 
 /* -------------------------------- sort ------------------------------- */
@@ -293,7 +353,7 @@ void PmergeMe::sort(int argc, char** argv)
 	printVector(vec);
 
 	clock_t startVec = clock();
-	IntVector sortedVec = pmergeVector(vec);
+	IntVector sortedVec = sortVector(vec);
 	clock_t endVec = clock();
 
 	std::cout << "after:  ";
@@ -303,7 +363,7 @@ void PmergeMe::sort(int argc, char** argv)
 	parseDeque(argc, argv, deq);
 
 	clock_t startDeq = clock();
-	IntDeque sortedDeq = pmergeDeque(deq);
+	IntDeque sortedDeq = sortDeque(deq);
 	clock_t endDeq = clock();
 
 	double elapsedVec = static_cast<double>(endVec - startVec) / CLOCKS_PER_SEC * 1e6;
