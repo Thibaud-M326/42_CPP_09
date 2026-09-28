@@ -67,8 +67,6 @@ void PmergeMe::printVector(const IntVector& values)
 
 /* ----------------------------- jacobsthal ---------------------------- */
 
-// Insertion order of the "pend" elements (0-based) : b1, b3 b2, b5 b4, b11..b6, ...
-// Each group ends on a Jacobsthal number (1, 3, 5, 11, 21, ...), capped to size.
 std::vector<int> PmergeMe::jacobsthalOrder(int size)
 {
 	std::vector<int> order;
@@ -94,7 +92,6 @@ std::vector<int> PmergeMe::jacobsthalOrder(int size)
 
 /* ------------------------------ std::vector -------------------------- */
 
-// pairs the elements as (small, big). The last one is kept apart if the count is odd.
 void PmergeMe::makePairVector(const ElemVector& toPair, ElemPairVector& pairs, bool& hasUnpaired, Elem& unpaired)
 {
 	hasUnpaired = (toPair.size() % 2 != 0);
@@ -111,14 +108,12 @@ void PmergeMe::makePairVector(const ElemVector& toPair, ElemPairVector& pairs, b
 	}
 }
 
-// the bigs, each one labeled with the index of its pair
 void PmergeMe::createMainVector(ElemVector& mains, const ElemPairVector& pairs)
 {
 	for (size_t i = 0; i < pairs.size(); i++)
 		mains.push_back(Elem(pairs[i].second.first, static_cast<int>(i)));
 }
 
-// first position in [0, end) where x can be inserted
 size_t PmergeMe::binarySearchVector(const ElemVector& arr, size_t end, int x)
 {
 	size_t low = 0;
@@ -149,14 +144,12 @@ PmergeMe::ElemVector PmergeMe::insertPendVector(const ElemVector& sortedMains, c
 	ElemVector chain;
 	ElemVector pend;
 
-	// bigs in sorted order, and the smalls that follow them : chain = a1..ak, pend = b1..bk
 	for (size_t i = 0; i < sortedMains.size(); i++)
 	{
 		const ElemPair& pair = pairs[sortedMains[i].second];
 		chain.push_back(pair.second);
 		pend.push_back(pair.first);
 	}
-	// the unpaired element is the last b, without any a
 	if (hasUnpaired)
 		pend.push_back(unpaired);
 
@@ -168,7 +161,6 @@ PmergeMe::ElemVector PmergeMe::insertPendVector(const ElemVector& sortedMains, c
 		size_t idx = *orderIt;
 		size_t end = chain.size();
 
-		// search only before its big
 		if (idx < sortedMains.size())
 			end = findPosVector(chain, pairs[sortedMains[idx].second].second.second);
 
@@ -213,7 +205,6 @@ PmergeMe::IntVector PmergeMe::sortVector(const IntVector& values)
 
 /* ------------------------------ std::deque --------------------------- */
 
-// pairs the elements as (small, big). The last one is kept apart if the count is odd.
 void PmergeMe::makePairDeque(const ElemDeque& toPair, ElemPairDeque& pairs, bool& hasUnpaired, Elem& unpaired)
 {
 	hasUnpaired = (toPair.size() % 2 != 0);
@@ -230,14 +221,12 @@ void PmergeMe::makePairDeque(const ElemDeque& toPair, ElemPairDeque& pairs, bool
 	}
 }
 
-// the bigs, each one labeled with the index of its pair
 void PmergeMe::createMainDeque(ElemDeque& mains, const ElemPairDeque& pairs)
 {
 	for (size_t i = 0; i < pairs.size(); i++)
 		mains.push_back(Elem(pairs[i].second.first, static_cast<int>(i)));
 }
 
-// first position in [0, end) where x can be inserted
 size_t PmergeMe::binarySearchDeque(const ElemDeque& arr, size_t end, int x)
 {
 	size_t low = 0;
@@ -268,14 +257,12 @@ PmergeMe::ElemDeque PmergeMe::insertPendDeque(const ElemDeque& sortedMains, cons
 	ElemDeque chain;
 	ElemDeque pend;
 
-	// bigs in sorted order, and the smalls that follow them : chain = a1..ak, pend = b1..bk
 	for (size_t i = 0; i < sortedMains.size(); i++)
 	{
 		const ElemPair& pair = pairs[sortedMains[i].second];
 		chain.push_back(pair.second);
 		pend.push_back(pair.first);
 	}
-	// the unpaired element is the last b, without any a
 	if (hasUnpaired)
 		pend.push_back(unpaired);
 
@@ -287,7 +274,6 @@ PmergeMe::ElemDeque PmergeMe::insertPendDeque(const ElemDeque& sortedMains, cons
 		size_t idx = *orderIt;
 		size_t end = chain.size();
 
-		// search only before its big
 		if (idx < sortedMains.size())
 			end = findPosDeque(chain, pairs[sortedMains[idx].second].second.second);
 
@@ -338,7 +324,6 @@ static double elapsedUs(const timespec& start, const timespec& end)
 		+ static_cast<double>(end.tv_nsec - start.tv_nsec) / 1e3;
 }
 
-// each timer covers the data management (argv -> container) and the sort
 void PmergeMe::sort(int argc, char** argv)
 {
 	isValidArgs(argc, argv);
