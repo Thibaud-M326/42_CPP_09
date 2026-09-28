@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <cctype>
+#include <cstdlib>
 #include <ctime>
 
 PmergeMe::PmergeMe()
@@ -20,54 +21,40 @@ PmergeMe::~PmergeMe()
 
 /* ------------------------------ parsing ------------------------------ */
 
-void PmergeMe::isValidArgs(std::string arg)
+void PmergeMe::isValidArgs(int argc, char** argv)
 {
-	std::string::iterator it;
-	int digitSize = 0;
-
-	for (it = arg.begin(); it != arg.end(); ++it)
+	for (int i = 1; i < argc; i++)
 	{
-		if (*it == ' ' && *(it + 1) == '-' && std::isdigit(*(it + 2)))
-			throw std::runtime_error(std::string("only positive number allowed"));
-		if (!std::isdigit(*it) && *it != ' ')
-			throw std::runtime_error(std::string("bad arguments input"));
-		if (std::isdigit(*it))
-			digitSize++;
-		if (*it == ' ')
-			digitSize = 0;
-		if (digitSize > 10)
-			throw std::runtime_error(std::string("bad arguments input, int overflow"));
+		std::string arg = argv[i];
+
+		if (arg.empty())
+			throw std::runtime_error(std::string("empty argument"));
+
+		for (std::string::iterator it = arg.begin(); it != arg.end(); ++it)
+			if (!std::isdigit(static_cast<unsigned char>(*it)))
+				throw std::runtime_error(std::string("only positive integers allowed : ") + arg);
+
+		if (arg.size() > 10)
+			throw std::runtime_error(std::string("int overflow : ") + arg);
+
+		std::istringstream iss(arg);
+		unsigned long n;
+		iss >> n;
+		if (iss.fail() || n > static_cast<unsigned long>(std::numeric_limits<int>::max()))
+			throw std::runtime_error(std::string("int overflow : ") + arg);
 	}
 }
 
-void PmergeMe::parseVector(const std::string& str, IntVector& values)
+void PmergeMe::parseVector(int argc, char** argv, IntVector& values)
 {
-	std::istringstream iss(str);
-	long n;
-
-	while (iss >> n)
-	{
-		if (n > std::numeric_limits<int>::max() || n < std::numeric_limits<int>::min())
-			throw std::runtime_error(std::string("bad arguments input, int overflow"));
-		if (values.size() >= 3000)
-			throw std::runtime_error(std::string("3000 elements max to sort"));
-		values.push_back(n);
-	}
+	for (int i = 1; i < argc; i++)
+		values.push_back(std::atoi(argv[i]));
 }
 
-void PmergeMe::parseDeque(const std::string& str, IntDeque& values)
+void PmergeMe::parseDeque(int argc, char** argv, IntDeque& values)
 {
-	std::istringstream iss(str);
-	long n;
-
-	while (iss >> n)
-	{
-		if (n > std::numeric_limits<int>::max() || n < std::numeric_limits<int>::min())
-			throw std::runtime_error(std::string("bad arguments input, int overflow"));
-		if (values.size() >= 3000)
-			throw std::runtime_error(std::string("3000 elements max to sort"));
-		values.push_back(n);
-	}
+	for (int i = 1; i < argc; i++)
+		values.push_back(std::atoi(argv[i]));
 }
 
 void PmergeMe::printVector(const IntVector& values)
@@ -309,14 +296,14 @@ PmergeMe::IntDeque PmergeMe::pmergeDeque(IntDeque toSort)
 
 /* -------------------------------- sort ------------------------------- */
 
-void PmergeMe::sort(std::string arg)
+void PmergeMe::sort(int argc, char** argv)
 {
-	isValidArgs(arg);
+	isValidArgs(argc, argv);
 	int jacobMaxSequence = 12;
 	_idxsJacob = idxsJacobsthal(jacobMaxSequence);
 
 	IntVector vec;
-	parseVector(arg, vec);
+	parseVector(argc, argv, vec);
 	_elements = vec.size();
 
 	std::cout << "before: ";
@@ -330,7 +317,7 @@ void PmergeMe::sort(std::string arg)
 	printVector(sortedVec);
 
 	IntDeque deq;
-	parseDeque(arg, deq);
+	parseDeque(argc, argv, deq);
 
 	clock_t startDeq = clock();
 	IntDeque sortedDeq = pmergeDeque(deq);

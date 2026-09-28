@@ -20,7 +20,7 @@ class PmergeMe {
 		int								_elements;
 		std::vector<int>	_idxsJacob;
 
-		void							isValidArgs(std::string unsortedInts);
+		void							isValidArgs(int argc, char** argv);
 
 		// jacobsthal
 		std::vector<int>	idxsJacobsthal(int size);
@@ -28,7 +28,7 @@ class PmergeMe {
 		std::vector<int>	getIdxsFromJacobsthal(std::vector<int> jacob);
 
 		// std::vector
-		void							parseVector(const std::string& str, IntVector& values);
+		void							parseVector(int argc, char** argv, IntVector& values);
 		void							printVector(const IntVector& values);
 		IntVector					pmergeVector(IntVector toSort);
 		void							makePairVector(IntVector& toPair, PairVector& pair, int& unpaired);
@@ -37,7 +37,7 @@ class PmergeMe {
 		IntVector					sortNextMainVector(IntVector& nextMain, PairVector& pend, int& unpaired);
 
 		// std::deque
-		void							parseDeque(const std::string& str, IntDeque& values);
+		void							parseDeque(int argc, char** argv, IntDeque& values);
 		void							printDeque(const IntDeque& values);
 		IntDeque					pmergeDeque(IntDeque toSort);
 		void							makePairDeque(IntDeque& toPair, PairDeque& pair, int& unpaired);
@@ -49,7 +49,7 @@ class PmergeMe {
 		PmergeMe();
 		~PmergeMe();
 
-		void sort(std::string unsortedInts);
+		void sort(int argc, char** argv);
 };
 
 #endif
