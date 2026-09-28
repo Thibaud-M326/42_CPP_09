@@ -341,35 +341,42 @@ PmergeMe::IntDeque PmergeMe::sortDeque(const IntDeque& values)
 
 /* -------------------------------- sort ------------------------------- */
 
+static double elapsedUs(const timespec& start, const timespec& end)
+{
+	return static_cast<double>(end.tv_sec - start.tv_sec) * 1e6
+		+ static_cast<double>(end.tv_nsec - start.tv_nsec) / 1e3;
+}
+
+// each timer covers the data management (argv -> container) and the sort
 void PmergeMe::sort(int argc, char** argv)
 {
 	isValidArgs(argc, argv);
 
+	timespec start;
+	timespec end;
+
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	IntVector vec;
 	parseVector(argc, argv, vec);
-	_elements = vec.size();
-
-	std::cout << "before: ";
-	printVector(vec);
-
-	clock_t startVec = clock();
 	IntVector sortedVec = sortVector(vec);
-	clock_t endVec = clock();
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	double elapsedVec = elapsedUs(start, end);
 
-	std::cout << "after:  ";
-	printVector(sortedVec);
-
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	IntDeque deq;
 	parseDeque(argc, argv, deq);
-
-	clock_t startDeq = clock();
 	IntDeque sortedDeq = sortDeque(deq);
-	clock_t endDeq = clock();
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	double elapsedDeq = elapsedUs(start, end);
 
-	double elapsedVec = static_cast<double>(endVec - startVec) / CLOCKS_PER_SEC * 1e6;
-	double elapsedDeq = static_cast<double>(endDeq - startDeq) / CLOCKS_PER_SEC * 1e6;
+	_elements = vec.size();
+
+	std::cout << "Before: ";
+	printVector(vec);
+	std::cout << "After: ";
+	printVector(sortedVec);
 
 	std::cout << std::fixed << std::setprecision(5);
-	std::cout << "Time to process a range of " << _elements << " elements with std::vector : " << elapsedVec << "us" << std::endl;
-	std::cout << "Time to process a range of " << _elements << " elements with std::deque : " << elapsedDeq << "us" << std::endl;
+	std::cout << "Time to process a range of " << _elements << " elements with std::vector : " << elapsedVec << " us" << std::endl;
+	std::cout << "Time to process a range of " << _elements << " elements with std::deque : " << elapsedDeq << " us" << std::endl;
 }
