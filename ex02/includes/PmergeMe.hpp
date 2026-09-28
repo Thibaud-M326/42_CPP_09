@@ -18,14 +18,11 @@ class PmergeMe {
 		PmergeMe& operator=(const PmergeMe& other);
 
 		int								_elements;
-		std::vector<int>	_idxsJacob;
 
 		void							isValidArgs(int argc, char** argv);
 
 		// jacobsthal
-		std::vector<int>	idxsJacobsthal(int size);
-		int								idxJacobsthal(int n);
-		std::vector<int>	getIdxsFromJacobsthal(std::vector<int> jacob);
+		std::vector<int>	jacobsthalOrder(int size);
 
 		// std::vector
 		void							parseVector(int argc, char** argv, IntVector& values);

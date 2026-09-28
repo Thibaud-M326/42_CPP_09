@@ -12,8 +12,7 @@
 
 PmergeMe::PmergeMe()
 :
-	_elements(0),
-	_idxsJacob()
+	_elements(0)
 {}
 
 PmergeMe::~PmergeMe()
@@ -77,39 +76,29 @@ void PmergeMe::printDeque(const IntDeque& values)
 
 /* ----------------------------- jacobsthal ---------------------------- */
 
-std::vector<int> PmergeMe::getIdxsFromJacobsthal(std::vector<int> jacob)
+// Insertion order of the "pend" elements (0-based) : b1, b3 b2, b5 b4, b11..b6, ...
+// Each group ends on a Jacobsthal number (1, 3, 5, 11, 21, ...), capped to size.
+std::vector<int> PmergeMe::jacobsthalOrder(int size)
 {
-	std::vector<int> completeJacob;
-	int previous = -1;
-	int current = 0;
+	std::vector<int> order;
 
-	std::vector<int>::iterator it;
-	for (it = jacob.begin(); it != jacob.end(); ++it)
+	if (size <= 0)
+		return order;
+	order.push_back(0);
+
+	int jPrev = 1;
+	int jCurr = 3;
+	while (jPrev < size)
 	{
-		current = *it;
-		for (; current > previous; current--)
-			completeJacob.push_back(current);
-		previous = *it;
+		int top = std::min(jCurr, size);
+		for (int i = top; i > jPrev; i--)
+			order.push_back(i - 1);
+
+		int jNext = jCurr + 2 * jPrev;
+		jPrev = jCurr;
+		jCurr = jNext;
 	}
-	return completeJacob;
-}
-
-int PmergeMe::idxJacobsthal(int n)
-{
-	if (n == 0)
-		return 0;
-	if (n == 1)
-		return 1;
-	return idxJacobsthal(n - 1) + 2 * idxJacobsthal(n - 2);
-}
-
-std::vector<int> PmergeMe::idxsJacobsthal(int size)
-{
-	std::vector<int> jac;
-	for (int i = 3; i < size + 3; i++)
-		jac.push_back(idxJacobsthal(i) - 2);
-
-	return getIdxsFromJacobsthal(jac);
+	return order;
 }
 
 /* ------------------------------ std::vector -------------------------- */
@@ -156,21 +145,19 @@ int PmergeMe::binarySearchVector(IntVector& arr, int high, int x)
 
 PmergeMe::IntVector PmergeMe::sortNextMainVector(IntVector& nextMain, PairVector& pend, int& unpaired)
 {
-	std::vector<int>::iterator jacobIt;
+	std::vector<int> order = jacobsthalOrder(pend.size());
+	std::vector<int>::iterator orderIt;
 
-	for (jacobIt = _idxsJacob.begin(); jacobIt != _idxsJacob.end(); ++jacobIt)
+	for (orderIt = order.begin(); orderIt != order.end(); ++orderIt)
 	{
-		if ((unsigned long)*jacobIt < pend.size())
-		{
-			PairVector::iterator pendIt = pend.begin() + *jacobIt;
+		PairVector::iterator pendIt = pend.begin() + *orderIt;
 
-			IntVector::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
-			int bigValuePos = std::distance(nextMain.begin(), bigIt);
-			int sortIndex = binarySearchVector(nextMain, bigValuePos, pendIt->first);
+		IntVector::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
+		int bigValuePos = std::distance(nextMain.begin(), bigIt);
+		int sortIndex = binarySearchVector(nextMain, bigValuePos, pendIt->first);
 
-			IntVector::iterator sortIndexIt = nextMain.begin() + sortIndex;
-			nextMain.insert(sortIndexIt, pendIt->first);
-		}
+		IntVector::iterator sortIndexIt = nextMain.begin() + sortIndex;
+		nextMain.insert(sortIndexIt, pendIt->first);
 	}
 
 	if (unpaired != -1)
@@ -247,21 +234,19 @@ int PmergeMe::binarySearchDeque(IntDeque& arr, int high, int x)
 
 PmergeMe::IntDeque PmergeMe::sortNextMainDeque(IntDeque& nextMain, PairDeque& pend, int& unpaired)
 {
-	std::vector<int>::iterator jacobIt;
+	std::vector<int> order = jacobsthalOrder(pend.size());
+	std::vector<int>::iterator orderIt;
 
-	for (jacobIt = _idxsJacob.begin(); jacobIt != _idxsJacob.end(); ++jacobIt)
+	for (orderIt = order.begin(); orderIt != order.end(); ++orderIt)
 	{
-		if ((unsigned long)*jacobIt < pend.size())
-		{
-			PairDeque::iterator pendIt = pend.begin() + *jacobIt;
+		PairDeque::iterator pendIt = pend.begin() + *orderIt;
 
-			IntDeque::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
-			int bigValuePos = std::distance(nextMain.begin(), bigIt);
-			int sortIndex = binarySearchDeque(nextMain, bigValuePos, pendIt->first);
+		IntDeque::iterator bigIt = std::find(nextMain.begin(), nextMain.end(), pendIt->second);
+		int bigValuePos = std::distance(nextMain.begin(), bigIt);
+		int sortIndex = binarySearchDeque(nextMain, bigValuePos, pendIt->first);
 
-			IntDeque::iterator sortIndexIt = nextMain.begin() + sortIndex;
-			nextMain.insert(sortIndexIt, pendIt->first);
-		}
+		IntDeque::iterator sortIndexIt = nextMain.begin() + sortIndex;
+		nextMain.insert(sortIndexIt, pendIt->first);
 	}
 
 	if (unpaired != -1)
@@ -299,8 +284,6 @@ PmergeMe::IntDeque PmergeMe::pmergeDeque(IntDeque toSort)
 void PmergeMe::sort(int argc, char** argv)
 {
 	isValidArgs(argc, argv);
-	int jacobMaxSequence = 12;
-	_idxsJacob = idxsJacobsthal(jacobMaxSequence);
 
 	IntVector vec;
 	parseVector(argc, argv, vec);
