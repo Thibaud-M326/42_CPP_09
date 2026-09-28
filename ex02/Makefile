@@ -8,6 +8,7 @@ INC_DIR = ./includes
 
 SRC =																			\
         $(SRC_DIR)/main.cpp								\
+        $(SRC_DIR)/PmergeMe.cpp						\
 
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.d)

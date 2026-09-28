@@ -13,11 +13,8 @@ int main(int argc, char **argv) {
 	try {
 		std::string unsortedInts = argv[1];
 
-		PmergeMe<std::vector> pmergeVector;
-		pmergeVector.sort(unsortedInts);
-
-		PmergeMe<std::deque> pmergeDeque;
-		pmergeDeque.sort(unsortedInts);
+		PmergeMe pmerge;
+		pmerge.sort(unsortedInts);
 
 	} catch (std::exception& e) {
 		std::cout << "Error : " << e.what() << std::endl;
