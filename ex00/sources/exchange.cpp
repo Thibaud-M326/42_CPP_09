@@ -8,7 +8,7 @@
 void	validateInputFileHeader(std::fstream& inputFile)
 {
 	if (!inputFile.is_open())
-		throw std::runtime_error("can't read data.csv");
+		throw std::runtime_error("can't read input.txt");
 
 	std::string line;
 
