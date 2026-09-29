@@ -18,7 +18,7 @@ PmergeMe::PmergeMe()
 PmergeMe::~PmergeMe()
 {}
 
-/* ------------------------------ parsing ------------------------------ */
+/* ------------------------------ parsing ------------------------------+ */
 
 void PmergeMe::isValidArgs(int argc, char** argv)
 {
